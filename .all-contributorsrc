@@ -1,0 +1,182 @@
+{
+  "projectName": "twiga",
+  "projectOwner": "Tanzania-AI-Community",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "jurmy24",
+      "name": "Victor Oldensand",
+      "avatar_url": "https://avatars.githubusercontent.com/u/21913954?v=4",
+      "profile": "https://github.com/jurmy24",
+      "contributions": [
+        "infra",
+        "code",
+        "bug",
+        "doc",
+        "design",
+        "example",
+        "eventOrganizing",
+        "fundingFinding",
+        "ideas",
+        "maintenance",
+        "mentoring",
+        "projectManagement",
+        "question",
+        "review",
+        "research",
+        "tutorial",
+        "talk",
+        "userTesting"
+      ]
+    },
+    {
+      "login": "EssaMohamedali",
+      "name": "EssaMohamedali",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50261366?v=4",
+      "profile": "https://github.com/EssaMohamedali",
+      "contributions": [
+        "business",
+        "content",
+        "eventOrganizing",
+        "financial",
+        "fundingFinding",
+        "ideas",
+        "projectManagement",
+        "promotion",
+        "talk"
+      ]
+    },
+    {
+      "login": "Annagrace1704",
+      "name": "Annagrace1704",
+      "avatar_url": "https://avatars.githubusercontent.com/u/180529411?v=4",
+      "profile": "https://github.com/Annagrace1704",
+      "contributions": [
+        "content",
+        "design",
+        "promotion"
+      ]
+    },
+    {
+      "login": "fredygerman",
+      "name": "Fredy Mgimba",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26197540?v=4",
+      "profile": "https://book.fredygerman.com",
+      "contributions": [
+        "code",
+        "infra"
+      ]
+    },
+    {
+      "login": "alvaro-mazcu",
+      "name": "\u00c1lvaro Mazcu\u00f1\u00e1n Herreros",
+      "avatar_url": "https://avatars.githubusercontent.com/u/102028776?v=4",
+      "profile": "https://github.com/alvaro-mazcu",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "wjunwei2001",
+      "name": "Wang Junwei",
+      "avatar_url": "https://avatars.githubusercontent.com/u/109643278?v=4",
+      "profile": "https://github.com/wjunwei2001",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "iamrobzy",
+      "name": "Robert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/60611384?v=4",
+      "profile": "https://iamrobzy.github.io/",
+      "contributions": [
+        "code",
+        "ideas",
+        "mentoring",
+        "projectManagement",
+        "question"
+      ]
+    },
+    {
+      "login": "Ben-Temming",
+      "name": "Ben-Temming",
+      "avatar_url": "https://avatars.githubusercontent.com/u/91560536?v=4",
+      "profile": "https://github.com/Ben-Temming",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "JohanL01",
+      "name": "JohanJohanJohan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55000709?v=4",
+      "profile": "https://github.com/JohanL01",
+      "contributions": [
+        "code",
+        "design",
+        "ideas"
+      ]
+    },
+    {
+      "login": "Silvia-00",
+      "name": "Silvia Mosca",
+      "avatar_url": "https://avatars.githubusercontent.com/u/144936497?v=4",
+      "profile": "https://github.com/Silvia-00",
+      "contributions": [
+        "audio",
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "Erikbou",
+      "name": "Erik Boustedt ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16526330?v=4",
+      "profile": "https://github.com/Erikbou",
+      "contributions": [
+        "code",
+        "content",
+        "data",
+        "ideas",
+        "financial"
+      ]
+    },
+    {
+      "login": "Bhargavvvvvv",
+      "name": "Bhargavvvvvv",
+      "avatar_url": "https://github.com/Bhargavvvvvv.png",
+      "profile": "https://github.com/Bhargavvvvvv",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "MommeAbbas",
+      "name": "MommeAbbas",
+      "avatar_url": "https://github.com/MommeAbbas.png",
+      "profile": "https://github.com/MommeAbbas",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "adricalm",
+      "name": "adricalm",
+      "avatar_url": "https://github.com/adricalm.png",
+      "profile": "https://github.com/adricalm",
+      "contributions": [
+        "code"
+      ]
+    }
+  ]
+}
