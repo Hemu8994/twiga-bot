@@ -1,0 +1,303 @@
+"""
+This module sets the env configs for our WhatsApp app.
+"""
+
+import os
+from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, Field, SecretStr, field_validator, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.utils.yaml_config import yaml_config
+
+
+class Environment(str, Enum):
+    PRODUCTION = "production"
+    STAGING = "staging"
+    DEVELOPMENT = "development"
+    LOCAL = "local"
+
+
+class BaseProviders(str, Enum):
+    TOGETHER = "together"
+    OPENAI = "openai"
+    OLLAMA = "ollama"
+    MODAL = "modal"
+
+
+class LLMProvider(str, Enum):
+    TOGETHER = BaseProviders.TOGETHER.value
+    OPENAI = BaseProviders.OPENAI.value
+    OLLAMA = BaseProviders.OLLAMA.value
+    MODAL = BaseProviders.MODAL.value
+    GOOGLE = "google"
+
+
+class EmbeddingProvider(str, Enum):
+    TOGETHER = BaseProviders.TOGETHER.value
+    OPENAI = BaseProviders.OPENAI.value
+    OLLAMA = BaseProviders.OLLAMA.value
+    MODAL = BaseProviders.MODAL.value
+
+
+class Prompt(str, Enum):
+    """Enumeration for system prompt names."""
+
+    TWIGA_SYSTEM = "twiga_system"
+    TWIGA_AGENT_SYSTEM = "twiga_agent_system"
+
+
+# Store configurations for the app
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=os.getenv("TWIGA_ENV", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+    )
+    """ REQUIRED SETTINGS """
+    # Meta settings
+    meta_api_version: str
+    meta_app_id: str
+    meta_app_secret: SecretStr
+
+    # WhatsApp settings
+    whatsapp_cloud_number_id: str
+    whatsapp_verify_token: SecretStr
+    whatsapp_api_token: SecretStr
+
+    # WhatsApp mock
+    mock_whatsapp: bool = False
+
+    # Message limiting settings
+    message_character_limit: int = 65000
+
+    # Database settings
+    database_url: SecretStr
+
+    # Business environment
+    environment: Environment = Environment.LOCAL
+    debug: bool = True
+
+    # WhatsApp template message settings
+    welcome_template_id: str = "twiga_registration_approved"
+
+    @property
+    def sync_database_url(self) -> str:
+        return self.database_url.get_secret_value().replace("+asyncpg", "")
+
+    """ OPTIONAL SETTINGS FOR PRODUCTION """
+    # Flows settings
+    onboarding_flow_id: Optional[str] = None
+    subjects_classes_flow_id: Optional[str] = None
+    flow_token_encryption_key: Optional[SecretStr] = None
+
+    whatsapp_business_public_key: Optional[SecretStr] = None
+    whatsapp_business_private_key: Optional[SecretStr] = None
+    whatsapp_business_private_key_password: Optional[SecretStr] = None
+
+    # Redis settings (for rate limiting)
+    redis_url: Optional[SecretStr] = None
+    user_message_limit: Optional[int] = None
+    global_message_limit: Optional[int] = None
+    time_to_live: Optional[int] = None  # In seconds (a day is 86400)
+
+    # User inactivity settings
+    user_inactivity_threshold_hours: int = 24  # Hours after which user becomes inactive
+
+    @field_validator("debug", mode="before")
+    @classmethod
+    def parse_business_env(cls, v):
+        if isinstance(v, bool):
+            return v
+        if isinstance(v, str):
+            return v.lower() in ("true", "True")
+        return False
+
+
+class LLMSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=os.getenv("TWIGA_ENV", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+    )
+
+    # LLM provider api key
+    api_key: Optional[SecretStr] = Field(default=None, validation_alias="llm_api_key")
+
+    # LLM-related settings
+    provider: LLMProvider = Field(
+        default=LLMProvider.OLLAMA, validation_alias="llm_provider"
+    )
+    llm_name: str = Field(
+        default=yaml_config["llm"]["model_name"], validation_alias="llm_model_name"
+    )
+
+    ollama_base_url: str = "http://host.docker.internal:11434/v1"
+    ollama_model_name: Optional[str] = yaml_config["llm"]["ollama"]["model_name"]
+    ollama_request_timeout: int = Field(
+        default=yaml_config["llm"]["ollama"]["request_timeout"],
+        validation_alias="ollama_llm_request_timeout",
+    )
+
+    modal_base_url: Optional[SecretStr] = None
+    modal_model_name: Optional[str] = yaml_config["llm"]["modal"]["model_name"]
+    modal_request_timeout: int = Field(
+        default=yaml_config["llm"]["modal"]["request_timeout"],
+        validation_alias="modal_llm_request_timeout",
+    )
+
+    # LangSmith tracing settings
+    langsmith_api_key: Optional[SecretStr] = None
+    langsmith_project: Optional[str] = yaml_config["llm"]["langsmith"]["project_name"]
+    langsmith_tracing: bool = yaml_config["llm"]["langsmith"]["tracing_enabled"]
+    langsmith_endpoint: Optional[str] = yaml_config["llm"]["langsmith"]["endpoint_url"]
+
+    # General LLM parameters
+    timeout: Optional[float] = yaml_config["llm"].get("timeout")
+    max_tokens: Optional[int] = yaml_config["llm"].get("max_tokens")
+    temperature: Optional[float] = yaml_config["llm"].get("temperature")
+    reasoning_effort: Optional[str] = yaml_config["llm"].get("reasoning_effort")
+    base_url: Optional[str] = yaml_config["llm"].get("base_url")
+
+    # Agent settings
+    agentic_mode: bool = Field(
+        default=yaml_config["llm"]["agent"]["agentic_mode"],
+        validation_alias="agentic_mode_enabled",
+    )
+    MAX_AGENT_ITERATIONS: int = yaml_config["llm"]["agent"]["max_agent_iterations"]
+
+
+class EmbeddingSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=os.getenv("TWIGA_ENV", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+    )
+
+    # Embedding provider api key
+    api_key: Optional[SecretStr] = Field(
+        default=None, validation_alias="embedding_api_key"
+    )
+
+    # Embedding-related settings
+    provider: EmbeddingProvider = Field(
+        default=EmbeddingProvider.OLLAMA, validation_alias="embedding_provider"
+    )
+    embedder_name: str = Field(
+        default=yaml_config["embedding"]["model_name"],
+        validation_alias="embedding_model",
+    )
+
+    ollama_model: Optional[str] = Field(
+        default=yaml_config["embedding"]["ollama"]["model_name"],
+        validation_alias="ollama_embedding_model",
+    )
+    ollama_url: Optional[str] = Field(
+        default=yaml_config["embedding"]["ollama"]["url"],
+        validation_alias="ollama_embedding_url",
+    )
+    ollama_request_timeout: int = Field(
+        default=yaml_config["embedding"]["ollama"]["request_timeout"],
+        validation_alias="ollama_embedding_request_timeout",
+    )
+
+    modal_model: Optional[str] = Field(
+        default=yaml_config["embedding"]["modal"]["model_name"],
+        validation_alias="modal_embedding_model",
+    )
+    modal_url: Optional[SecretStr] = Field(
+        default=None, validation_alias="modal_embedding_url"
+    )
+    modal_request_timeout: int = Field(
+        default=yaml_config["embedding"]["modal"]["request_timeout"],
+        validation_alias="modal_embedding_request_timeout",
+    )
+
+
+class ToolLLMConfig(BaseModel):
+    """LLM configuration for a specific tool"""
+
+    tool_model_name: str
+    provider: LLMProvider
+    api_key: Optional[SecretStr] = None
+    tool_model_params: dict = {}
+
+
+class ToolSettings(BaseSettings):
+    """Per-tool LLM configurations"""
+
+    model_config = SettingsConfigDict(
+        env_file=os.getenv("TWIGA_ENV", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+        env_prefix="TOOL_",
+    )
+
+    solve_equation_api_key: Optional[SecretStr] = Field(
+        default=None, validation_alias="llm_api_key"
+    )
+    solve_equation: ToolLLMConfig = Field(
+        default=ToolLLMConfig(
+            tool_model_name=yaml_config["tools"]["solve_equation"]["model_name"],
+            provider=yaml_config["tools"]["solve_equation"]["provider"],
+            tool_model_params={
+                "temperature": yaml_config["tools"]["solve_equation"]["temperature"]
+            },
+        )
+    )
+
+    @model_validator(mode="after")
+    def inject_api_keys(self):
+        if self.solve_equation_api_key:
+            self.solve_equation.api_key = self.solve_equation_api_key
+        return self
+
+
+def initialize_settings():
+    settings = Settings()  # type: ignore
+    llm_settings = LLMSettings()
+    embedding_settings = EmbeddingSettings()
+    tool_settings = ToolSettings()
+
+    # Validate required Meta settings
+    assert (
+        settings.meta_api_version and settings.meta_api_version.strip()
+    ), "META_API_VERSION is required"
+    assert (
+        settings.meta_app_id and settings.meta_app_id.strip()
+    ), "META_APP_ID is required"
+    assert (
+        settings.meta_app_secret and settings.meta_app_secret.get_secret_value().strip()
+    ), "META_APP_SECRET is required"
+
+    # Validate required WhatsApp settings
+    assert (
+        settings.whatsapp_cloud_number_id and settings.whatsapp_cloud_number_id.strip()
+    ), "WHATSAPP_CLOUD_NUMBER_ID is required"
+    assert (
+        settings.whatsapp_verify_token
+        and settings.whatsapp_verify_token.get_secret_value().strip()
+    ), "WHATSAPP_VERIFY_TOKEN is required"
+    assert (
+        settings.whatsapp_api_token
+        and settings.whatsapp_api_token.get_secret_value().strip()
+    ), "WHATSAPP_API_TOKEN is required"
+
+    # Validate other required settings
+    assert (
+        settings.database_url and settings.database_url.get_secret_value().strip()
+    ), "DATABASE_URL is required"
+
+    return settings, llm_settings, embedding_settings, tool_settings
+
+
+settings, llm_settings, embedding_settings, tool_settings = initialize_settings()
